@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import br.com.ruangomes.front_gestao_vagas.modules.candidate.dto.CreateCandidateDTO;
 import br.com.ruangomes.front_gestao_vagas.modules.candidate.service.ApplyJobService;
 import br.com.ruangomes.front_gestao_vagas.modules.candidate.service.CandidateService;
+import br.com.ruangomes.front_gestao_vagas.modules.candidate.service.CreateCandidateService;
 import br.com.ruangomes.front_gestao_vagas.modules.candidate.service.FindJobsServive;
 import br.com.ruangomes.front_gestao_vagas.modules.candidate.service.ProfileCandidateService;
+import br.com.ruangomes.front_gestao_vagas.utils.FormatErrorMessage;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +42,9 @@ public class CandidateController {
 
     @Autowired
     private ApplyJobService applyJobService;
+
+    @Autowired
+    private CreateCandidateService createCandidateService;
 
     @GetMapping("/login")
     public String login() {
@@ -108,6 +114,23 @@ public class CandidateController {
         this.applyJobService.execute(getToken(), jobId);
 
         return "redirect:/candidate/jobs";
+    }
+
+    @GetMapping("/create")
+    public String create(Model model) {
+        model.addAttribute("candidate", new CreateCandidateDTO());
+        return "candidate/create";
+    }
+
+    @PostMapping("/create")
+    public String save(CreateCandidateDTO candidate, Model model) {
+        try {
+            this.createCandidateService.execute(candidate);
+        } catch (HttpClientErrorException e) {
+            model.addAttribute("error_message", FormatErrorMessage.formatErrorMessage(e.getResponseBodyAsString()));
+        }
+        model.addAttribute("candidate", candidate);
+        return "candidate/create";
     }
 
     private String getToken() {
