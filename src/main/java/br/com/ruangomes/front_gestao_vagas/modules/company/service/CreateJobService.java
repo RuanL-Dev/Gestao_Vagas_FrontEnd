@@ -1,6 +1,4 @@
-package br.com.ruangomes.front_gestao_vagas.modules.candidate.service;
-
-import java.util.UUID;
+package br.com.ruangomes.front_gestao_vagas.modules.company.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -9,13 +7,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import br.com.ruangomes.front_gestao_vagas.modules.company.dto.CreateJobsDTO;
+
 @Service
-public class ApplyJobService {
+public class CreateJobService {
 
     @Value("${host.api.gestao_vagas}")
     private String hostAPIGestaoVagas;
 
-    public String execute(String token, UUID idJob) {
+    public String execute(CreateJobsDTO jobs, String token) {
 
         RestTemplate rt = new RestTemplate();
 
@@ -23,9 +23,9 @@ public class ApplyJobService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
 
-        HttpEntity<UUID> request = new HttpEntity<>(idJob, headers);
+        HttpEntity<CreateJobsDTO> request = new HttpEntity<>(jobs, headers);
 
-        String url = hostAPIGestaoVagas.concat("/candidate/job/apply");
+        var url = hostAPIGestaoVagas.concat("/company/job/");
 
         var result = rt.postForObject(url, request, String.class);
 
